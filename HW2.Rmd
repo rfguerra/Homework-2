@@ -22,11 +22,13 @@ Abalone
 ```{r}
 
 distr <- Abalone$age
-hist(distr, main= "Distribution of age", xlab= "Abalone age", ylim= c(0,1500), xlim= c(0,35), col= "darksalmon", yaxt= "n")
+hist(distr, main= "Distribution of age", xlab= "Abalone age", 
+     ylim= c(0,1500), xlim= c(0,35), col= "darksalmon", yaxt= "n")
 axis(side= 2, at= seq(0, 1500, by=250), cex.axis= 0.6, las= 1)
 
 ```
-Most of the abalone in the data set has an age in the range 10-12 years, the youngest abalone is 2.5 years, and the oldest abalone is 30.5 years.
+Most of the abalone in the data set has an age in the range 10-12 years,
+the youngest abalone is 2.5 years, and the oldest abalone is 30.5 years.
 
 **2.**
 
@@ -48,7 +50,8 @@ Abalone_test
 
 ```{r}
 
-Abalone_recipe <- recipe(age ~ M + X0.455 + X0.365 + X0.095 + X0.514 + X0.2245 + X0.101 + X0.15, data= Abalone_train)
+Abalone_recipe <- recipe(age ~ M + X0.455 + X0.365 + X0.095 + X0.514 + X0.2245 
+                         + X0.101 + X0.15, data= Abalone_train)
 
 summary(Abalone_recipe)
 
@@ -91,7 +94,8 @@ Interaction3
 
 ```
 
-The variable rings is proportional to the age of the abalone, however taking it into consideration to predict the age of the abalone can lead to overfitting.
+The variable rings is proportional to the age of the abalone, however taking 
+it into consideration to predict the age of the abalone can lead to overfitting.
 Rings is not exclusive and other variables can alter the final prediction.
 
 **4.**
@@ -120,10 +124,13 @@ lm_Abaflow<- workflow() %>%
 
 lm_Abafit <- fit(lm_Abaflow, Abalone_train)
 
-FitModel <- lm(age ~ M + X0.455+ X0.365+ X0.095+ X0.514+ X0.2245 + X0.15, data= Abalone)
+FitModel <- lm(age ~ M + X0.455+ X0.365+ X0.095+ X0.514+ X0.2245 + X0.15, 
+               data= Abalone)
 summary(FitModel)
 
-Hypothetical <- data.frame(M= c('F'), X0.455= c(0.50), X0.365= c(0.10), X0.095= c(0.30), X0.514= c(4), X0.2245= c(1), X0.101= c(2), X0.15= c(1))
+Hypothetical <- data.frame(M= c('F'), X0.455= c(0.50), X0.365= c(0.10), 
+                           X0.095= c(0.30), X0.514= c(4), X0.2245= c(1), 
+                           X0.101= c(2), X0.15= c(1))
 
 predict(FitModel, newdata= Hypothetical)
 
