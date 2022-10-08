@@ -1,5 +1,5 @@
 
-```{r include= FALSE}
+```{r}
 library(tidyverse)
 library(tidymodels)
 library(ggplot2)
