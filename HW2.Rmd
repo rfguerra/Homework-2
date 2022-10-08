@@ -1,5 +1,5 @@
 
-```{r}
+```{r include= FALSE}
 library(tidyverse)
 library(tidymodels)
 library(ggplot2)
@@ -15,7 +15,6 @@ Abalone_$age <- Abalone_$X15 + 1.5
 
 Abalone <- Abalone_
 Abalone <- transform(Abalone_, age= X15 + 1.5)
-Abalone
 
 ```
 
@@ -39,10 +38,8 @@ set.seed(2022)
 Abalone_split <- initial_split(Abalone, prop= 0.80, strata= age)
 
 Abalone_train <- training(Abalone_split)
-Abalone_train
 
 Abalone_test <- testing(Abalone_split)
-Abalone_test
 
 ```
 
@@ -133,6 +130,12 @@ Hypothetical <- data.frame(M= c('F'), X0.455= c(0.50), X0.365= c(0.10),
                            X0.101= c(2), X0.15= c(1))
 
 predict(FitModel, newdata= Hypothetical)
+ 
+```
+
+The hypothetical abalone is approximately 24 years of age.
+
+```{r}
 
 lm_Abafit %>%
   extract_fit_parsnip() %>%
@@ -141,11 +144,9 @@ lm_Abafit %>%
 PredAbalone <- predict(lm_Abafit, new_data= Abalone_train %>% select(-age) )
 PredAbalone %>%
   head()
- 
- 
+
 ```
 
-The hypothetical abalone is approximately 24 years of age.
 
 **7.**
 
