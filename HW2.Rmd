@@ -1,0 +1,163 @@
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(ggplot2)
+
+```
+
+**1.**
+
+```{r}
+
+Abalone_ <- read.csv("abalone.data")
+Abalone_$age <- Abalone_$X15 + 1.5
+
+Abalone <- Abalone_
+Abalone <- transform(Abalone_, age= X15 + 1.5)
+Abalone
+
+```
+
+```{r}
+
+distr <- Abalone$age
+hist(distr, main= "Distribution of age", xlab= "Abalone age", ylim= c(0,1500), xlim= c(0,35), col= "darksalmon", yaxt= "n")
+axis(side= 2, at= seq(0, 1500, by=250), cex.axis= 0.6, las= 1)
+
+```
+Most of the abalone in the data set has an age in the range 10-12 years, the youngest abalone is 2.5 years, and the oldest abalone is 30.5 years.
+
+**2.**
+
+```{r}
+
+set.seed(2022)
+
+Abalone_split <- initial_split(Abalone, prop= 0.80, strata= age)
+
+Abalone_train <- training(Abalone_split)
+Abalone_train
+
+Abalone_test <- testing(Abalone_split)
+Abalone_test
+
+```
+
+**3.**
+
+```{r}
+
+Abalone_recipe <- recipe(age ~ M + X0.455 + X0.365 + X0.095 + X0.514 + X0.2245 + X0.101 + X0.15, data= Abalone_train)
+
+summary(Abalone_recipe)
+
+```
+```{r}
+Abalone_recipe_steps <- Abalone_recipe %>%
+  step_impute_mean(all_numeric()) %>%
+  step_dummy_multi_choice(all_nominal_predictors()) %>%
+  step_center(all_predictors()) %>%
+  step_scale(all_predictors()) %>%
+  step_nzv(all_predictors())
+
+Abalone_recipe_steps
+  
+```
+```{r}
+
+Abalone_recipe_prep <- prep(Abalone_recipe_steps, training = Abalone_train)
+Abalone_recipe_prep
+
+Abalone_recipe_final <- bake(Abalone_recipe_prep, Abalone_train)
+Abalone_recipe_final
+
+Abalone_recipe_test <- bake(Abalone_recipe_prep, Abalone_test)
+Abalone_recipe_test
+
+```
+
+```{r}
+
+Interaction1 <- lm(age ~ M + X0.2245, data= Abalone)
+Interaction1
+
+Interaction2 <- lm(age ~ X0.455 + X0.365, data= Abalone)
+Interaction2
+
+Interaction3 <- lm(age ~ X0.2245 + X0.15, data= Abalone)
+Interaction3
+
+
+```
+
+The variable rings is proportional to the age of the abalone, however taking it into consideration to predict the age of the abalone can lead to overfitting.
+Rings is not exclusive and other variables can alter the final prediction.
+
+**4.**
+
+```{r}
+
+lm_Abalone <- linear_reg() %>%
+  set_engine(("lm"))
+lm_Abalone
+
+```
+
+**5.**
+
+```{r}
+
+lm_Abaflow<- workflow() %>%
+  add_model(lm_Abalone) %>%
+  add_recipe(Abalone_recipe)
+
+```
+
+**6.**
+
+```{r}
+
+lm_Abafit <- fit(lm_Abaflow, Abalone_train)
+
+FitModel <- lm(age ~ M + X0.455+ X0.365+ X0.095+ X0.514+ X0.2245 + X0.15, data= Abalone)
+summary(FitModel)
+
+Hypothetical <- data.frame(M= c('F'), X0.455= c(0.50), X0.365= c(0.10), X0.095= c(0.30), X0.514= c(4), X0.2245= c(1), X0.101= c(2), X0.15= c(1))
+
+predict(FitModel, newdata= Hypothetical)
+
+lm_Abafit %>%
+  extract_fit_parsnip() %>%
+  tidy()
+
+PredAbalone <- predict(lm_Abafit, new_data= Abalone_train %>% select(-age) )
+PredAbalone %>%
+  head()
+ 
+ 
+```
+
+The hypothetical abalone is approximately 24 years of age.
+
+**7.**
+
+```{r}
+
+PredAbalone <- bind_cols(PredAbalone, Abalone_train %>% select(age))
+PredAbalone %>%
+  head()
+
+PredAbalone %>%
+  ggplot(aes(x= .pred, y= age)) +
+  geom_point(alpha= 0.25) +
+  geom_abline(lty= 2) +
+  coord_obs_pred()
+
+Abalone_metrics <- metric_set(rsq, rmse, mae)
+Abalone_metrics(PredAbalone, truth= age, estimate= .pred)
+
+```
+
+The R^2 value demonstrates that approximately 53.11% of the variance of
+dependent variables is explained by the variance of the independent variable.
