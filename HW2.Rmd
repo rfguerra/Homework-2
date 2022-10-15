@@ -1,5 +1,5 @@
 
-```{r}
+```{r include}
 library(tidyverse)
 library(tidymodels)
 library(ggplot2)
@@ -56,7 +56,7 @@ summary(Abalone_recipe)
 ```{r}
 Abalone_recipe_steps <- Abalone_recipe %>%
   step_impute_mean(all_numeric()) %>%
-  step_dummy_multi_choice(all_nominal_predictors()) %>%
+  step_dummy(all_nominal_predictors()) %>%
   step_center(all_predictors()) %>%
   step_scale(all_predictors()) %>%
   step_nzv(all_predictors())
